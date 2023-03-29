@@ -38,13 +38,21 @@ insert into personnage(nom) values ('Iaritina kely'),
                                    ('Booba be'),
                                    ('Jason Statham'),
                                    ('Dwayne Jhonson');
+
+ insert into personnage(nom) values ('Aro kely'),
+                                                ('Andry be'),
+                                                ('Mianta kely'),
+                                                ('Momo Jhonson'),
+                                                ('Carl Jhonson'),
+                                                ('CJ Mich'),
+                                                ('Aldo Gros');
 select * from personnage;
 
 create table scene(
     idscene serial primary key,
     nom_scene varchar(80) unique ,
     idtournage int references tournage (idtournage),
-    idplateau int references plateau (idplateau),
+    idplateau int references plateau (idplateau)
 );
 
 insert into scene(idtournage, nom_scene,idplateau) VALUES (1,'Scene milomano',1),(1,'Scene maka sary anaty rano',2);

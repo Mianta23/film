@@ -303,6 +303,7 @@
                 <br>
                 <input type="submit" class="btn btn-primary" value="Valider">
             </form>
+            <button class="btn btn-primary"><a href="<%=request.getContextPath()%>/ListePlateau">Plateau</a></button>
         </div>
         <p class="h2">Liste:</p>
         <table class="table table-striped">

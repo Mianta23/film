@@ -1,9 +1,9 @@
+<%@ page import="com.example.film.model.Plateau" %>
+<%@ page import="com.example.film.model.Disponibilite" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@page import="java.util.List"%>
-<%@page import="com.example.film.model.*"%>
-<%List<Plateau> plateau = (List<Plateau>)request.getAttribute("plateau");%>
-<%List<Scene> scene = (List<Scene>)request.getAttribute("scene");%>
-<%int id = (int)request.getAttribute("id");%>
+<%Plateau plateau = (Plateau)request.getAttribute("plateau");%>
+<%List<Disponibilite> dispo = (List<Disponibilite>)request.getAttribute("disponible");%>
 <html>
     <head>
         <link href="${pageContext.request.contextPath}/assets/img/favicon.png" rel="icon">
@@ -24,7 +24,7 @@
 
         <!-- Template Main CSS File -->
         <link href="${pageContext.request.contextPath}/assets/css/style.css" rel="stylesheet">
-        <title>Liste scenes</title>
+        <title>Disponibilite</title>
     </head>
     <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -287,91 +287,37 @@
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1>Liste des scenes</h1>
+            <h1>Liste des films</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item">Films</li>
-                    <li class="breadcrumb-item active">Scenes</li>
+                    <li class="breadcrumb-item">Plateaux</li>
+                    <li class="breadcrumb-item active">Indispo</li>
                 </ol>
             </nav>
         </div>
-        <div class="col-3">
-            <h1>Ajouter une scene</h1>
-            <form action="new-scene" method="post">
-                <input type="hidden" name="idfilm" value="<%=id%>">
-                <div class="form-group">
-                    <label>Description</label>
-                    <input type="text" name="nomScene" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Plateau</label>
-                    <select name="idplateau" class="form-select">
-                        <%for(Plateau p: plateau) {%>
-                        <option value="<%=p.getId()%>"><%=p.getNomPlateau()%></option>
-                        <%}%>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Heure debut</label>
-                    <input type="text" name="debut" value="00:00:00" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Heure fin</label>
-                    <input type="text" name="fin" value="00:00:00" class="form-control">
-                </div>
-                <br>
-                <input type="submit" class="btn btn-primary" value="Valider">
-            </form>
-        </div>
-
-        <form action ="<%=request.getContextPath()%>/recheche_scene"method ="GET">
-            <input type="hidden" name="id" value="<%=id %>">
-            <input type="text" name="nomscene">
-            <select name = "plateau">
-                <%for(Plateau pl: plateau){%>
-                <option value="<%=pl.getId()%>"><%=pl.getNomPlateau()%></option>
-                <%}%>
-            </select>
-            <input type="time" name="debut">
-            <input type="submit" value="rechercher">
+        <form action="<%=request.getContextPath()%>/recherche" method="get">
+            <label>
+                Recherche:
+                <input type="hidden" name="id" value="<%=plateau.getId()%>">
+                <input type="date" name="date">
+            </label>
+            <input type="submit" value="Rechercher">
         </form>
-
-        <p class="h2">Liste:</p>
+        <p class="h2">Plateaux indisponible dans les dates suivants:</p>
         <table class="table table-striped">
             <tr>
-                <th>Nom scene</th>
-                <th>Film</th>
                 <th>Plateau</th>
-                <th>Debut</th>
-                <th>Fin</th>
-                <th></th>
+                <th>Scene</th>
+                <th>Dates</th>
             </tr>
-            <%for(Scene s:scene){%>
+            <%for(Disponibilite d:dispo){%>
             <tr>
-                <td><%=s.getNomScene()%></td>
-                <td><%=s.getFilm().getFilm()%></td>
-                <td><%=s.getPlateau().getNomPlateau()%></td>
-                <td><%=s.getDebut()%></td>
-                <td><%=s.getFin()%></td>
-                <td><a href="liste-tache?id=<%=s.getId()%>">Voir detail</a></td>
+                <td><%=plateau.getNomPlateau()%></td>
+                <td><%=d.getScene().getNomScene()%></td>
+                <td><%=d.getDates()%></td>
             </tr>
             <%}%>
         </table>
-    </main>
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-    <!-- Vendor JS Files -->
-    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/chart.js/chart.min.js"></script>
-    <script src="assets/vendor/echarts/echarts.min.js"></script>
-    <script src="assets/vendor/quill/quill.min.js"></script>
-    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
-
-    <!-- Template Main JS File -->
-    <script src="assets/js/main.js"></script>
     </body>
 </html>

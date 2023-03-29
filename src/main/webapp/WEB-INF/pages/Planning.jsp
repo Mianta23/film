@@ -294,22 +294,26 @@
               </ol>
           </nav>
       </div>
-      <div class="col-3">
+
         <h1>Planning <%=film.getFilm()%></h1>
         <form action="<%= request.getContextPath()%>/plan" method="GET">
-            <div class="form-group">
-                <label>Date debut</label>
-                <input type="date" name="debut" class="form-control">
+            <div class="col-2">
+                <div class="form-group">
+                    <label>Date debut</label>
+                    <input type="date" name="debut" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Date fin</label>
+                    <input type="date" name="fin" class="form-control">
+                </div>
+                <input type="hidden" name="id" value="<%=film.getId()%>">
+                <br>
+                <input type="submit" class="btn btn-primary" value="voir">
             </div>
-            <div class="form-group">
-                <label>Date fin</label>
-                <input type="date" name="fin" class="form-control">
-            </div>
-            <input type="hidden" name="id" value="<%=film.getId()%>">
-            <br>
-            <input type="submit" class="btn btn-primary" value="voir">
             <br>
             <p class="h2">Liste:</p>
+            <div class="col-auto">
+
             <table class="table table-striped">
             <tr>
                 <th>#</th>
@@ -331,8 +335,9 @@
             </tr>
             <%}%>
         </table>
-
+            </div>
         </form>
+
       </div>
   </main>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

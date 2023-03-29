@@ -40,7 +40,10 @@ public class Film {
         ArrayList<Plateau> listPlateau = this.plannifierScene(cesScene,list);
         Plateau p = Tournage.maxScene(listPlateau,new ArrayList<Plateau>());
         ArrayList<Plateau> stocker = new ArrayList<>();
-        this.plannificationPlateau(LocalDate.parse(debut),LocalDate.parse(fin),p,listPlateau,stocker,list);
+        LocalDate deb = LocalDate.parse(debut);
+        LocalDate f = LocalDate.parse(fin);
+        ArrayList<Plateau> lir = new ArrayList<>();
+        this.plannificationPlateau(dao,deb,f,p,listPlateau,stocker,list,lir);
         return list;
     }
 
@@ -53,19 +56,47 @@ public class Film {
         return scene;
     }
 
-    public void plannificationPlateau(LocalDate debut , LocalDate fin, Plateau p, ArrayList<Plateau> list, ArrayList<Plateau> stocker, List<Scene> scene){
-        if(p != null){
-            debut = p.planeListScenne(debut,fin,scene);
-            stocker.add(p);
-            this.plannificationPlateau(debut,fin,this.plateauAkaiky(p,list,stocker),list,stocker,scene);
+    public void plannificationPlateau(HibernateDAO dao,LocalDate debut , LocalDate fin, Plateau p, ArrayList<Plateau> list, ArrayList<Plateau> stocker, List<Scene> scene,ArrayList<Plateau> lir) {
+
+        if (p != null && (fin.isEqual(debut) == true || debut.isBefore(fin) ==true)) {
+            p.defDisponibilite(dao);
+            if (p.isDisponible(debut, dao) == true) {
+                debut = p.planeListScenne(debut, fin, scene);
+                stocker.add(p);
+            } else {
+                lir.add(p);
+                p = this.returnPlateau(list,lir,stocker);
+                if(p != null){
+                    this.plannificationPlateau(dao, debut, fin, p, list, stocker, scene, lir);
+                }else{
+                    lir = new ArrayList<>();
+                    debut = debut.plusDays(1);
+                    p = this.returnPlateau(list,lir,stocker);
+                    this.plannificationPlateau(dao, debut, fin, p, list, stocker, scene, lir);
+                }
+            }
+            this.plannificationPlateau(dao, debut, fin, this.plateauAkaiky(p, list, stocker), list, stocker, scene, lir);
         }
+    }
+
+    public Plateau returnPlateau(ArrayList<Plateau> listPla,ArrayList<Plateau> lir,ArrayList<Plateau> stocker){
+        Plateau p = null;
+        int i = 0;
+        boolean is = true;
+        for(i = 0 ; i < listPla.size() ; i++){
+            if(Tournage.isExiste(listPla.get(i),lir) == false && Tournage.isExiste(listPla.get(i),stocker) == false){
+                p = listPla.get(i);
+                break;
+            }
+        }
+        return p;
     }
 
     public Plateau plateauAkaiky(Plateau plateau,ArrayList<Plateau> list,ArrayList<Plateau> stocker){
         int i = 0, g = 0;
         Plateau p = null;
         for(i = 0 ; i < list.size() ; i++){
-            if(Tournage.isExiste(list.get(i),stocker) == false){
+            if(Tournage.isExiste(list.get(i),stocker) == false ){
                 p = list.get(i);
                 g = i;
                 break;
@@ -73,7 +104,7 @@ public class Film {
         }
         if(p != null){
             for(i = 0 ; i < list.size() ; i++){
-                if(Tournage.isExiste(list.get(i),stocker) == false  && Tournage.calculDistance(p,plateau) > Tournage.calculDistance(plateau,list.get(i))){
+                if(  Tournage.isExiste(list.get(i),stocker) == false  && Tournage.calculDistance(p,plateau) > Tournage.calculDistance(plateau,list.get(i))){
                     p = list.get(i);
                 }
             }

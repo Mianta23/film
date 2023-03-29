@@ -1,6 +1,9 @@
 package com.example.film.model;
 
 
+import com.example.film.dao.HibernateDAO;
+import org.hibernate.annotations.Columns;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,11 +27,24 @@ public class Plateau {
     private double y;
 
     @Transient
+    private List<Disponibilite> disponibilites;
+
+
+    @Transient
     private List<Scene> listScene;
 
     @Transient
     private int nombre = 0;
-    public boolean isValable(List<Scene> scenePl,Scene scene){
+
+    public List<Disponibilite> getDisponibilites() {
+        return disponibilites;
+    }
+
+    public void setDisponibilites(List<Disponibilite> disponibilites) {
+        this.disponibilites = disponibilites;
+    }
+
+    public boolean isValable(List<Scene> scenePl, Scene scene){
         boolean is = true;
         int i = 0;
         if(scenePl.size() > 0){
@@ -47,6 +63,15 @@ public class Plateau {
     public LocalDate planeListScenne(LocalDate debut, LocalDate fin,List<Scene> list){
         debut = this.plannifier(debut,fin,this.listScene,list);
         return debut;
+    }
+
+    public boolean isDisponible(LocalDate d,HibernateDAO dao){
+        boolean is = true;
+        int i = 0;
+        if(dao.findQuery(Disponibilite.class,"select * from disponibilite where idplateau="+this.id +" and dates='"+d.toString()+"'").size() > 0){
+            is = false;
+        }
+        return is;
     }
 
     public LocalDate plannifier(LocalDate debut, LocalDate fin,List<Scene> list,List<Scene> stock){
@@ -96,6 +121,9 @@ public class Plateau {
     }
     public void setId(int id) {
         this.id = id;
+    }
+    public void defDisponibilite(HibernateDAO dao){
+        this.disponibilites = dao.findQuery(Disponibilite.class,"select * from disponibilite where idplateau="+this.id);
     }
     public String getNomPlateau() {
         return nomPlateau;

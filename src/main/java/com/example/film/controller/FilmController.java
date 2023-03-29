@@ -11,6 +11,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -110,6 +111,14 @@ public class FilmController
         return "Tache";
     }
 
+    //disponibilite
+    @GetMapping("/liste-disponibilite")
+    private String listeDisponibilitePlateau(@RequestParam int id,Model model,HttpServletRequest request)
+    {
+        model.addAttribute("plateau",dao.findById(Plateau.class,id));
+        model.addAttribute("disponible",dao.findQuery(Disponibilite.class,"select * from disponibilite where idplateau="+id));
+        return "List-disp";
+    }
     @PostMapping("/new-tache")
     private Object newTache(@ModelAttribute Tache tache,HttpServletRequest request)
     {
@@ -140,6 +149,17 @@ public class FilmController
         return "Planning";
     }
 
+    @GetMapping("/disponibilite")
+    private  void dispo(@RequestParam int id,@RequestParam String date,Model model,HttpServletRequest request){
+        System.out.println(date + " "+id);
+        Scene scene = dao.findById(Scene.class,id);
+        Disponibilite disp = new Disponibilite();
+        disp.setScene(scene);
+        disp.setPlateau(scene.getPlateau());
+        disp.setDates(Date.valueOf(date));
+        System.out.println(disp.getDates() + " "+disp.getPlateau().getNomPlateau());
+        dao.create(disp);
+    }
     @GetMapping("/plan")
     private String plan(@RequestParam String debut,@RequestParam String fin, @RequestParam int id,Model model,HttpServletRequest request)
     {
@@ -148,5 +168,45 @@ public class FilmController
         model.addAttribute("scene",t.planning(debut,fin,dao,request.getParameterValues("scene")));
         request.setAttribute("id",id);
         return "RepPlaning";
+    }
+
+    @GetMapping("ListePlateau")
+    private String ListePlateau(Model model)
+    {
+        model.addAttribute("plateau",dao.findAll(Plateau.class));
+        return "Plateau";
+    }
+
+    //Recherche avance
+    @GetMapping("recherche")
+    private String recherche(Model model,@RequestParam int id,@RequestParam String date)
+    {
+        if(date == "")
+        {
+            model.addAttribute("disponible",dao.findQuery(Disponibilite.class,"select * from disponibilite where idplateau = "+id));
+            model.addAttribute("plateau",dao.findById(Plateau.class,id));
+        }
+        else {
+            model.addAttribute("disponible",dao.findQuery(Disponibilite.class,"select * from disponibilite where idplateau = "+id+" AND dates = '"+date+"'"));
+            model.addAttribute("plateau",dao.findById(Plateau.class,id));
+
+        }
+        return "List-disp";
+    }
+    @GetMapping("/recheche_scene")
+    private String rechercheScene(@RequestParam int id,@RequestParam String debut,@RequestParam int plateau,@RequestParam String nomscene,Model model,HttpServletRequest request)
+    {
+        String sql = " select * from scene where idfilm="+id + " and idplateau="+plateau;
+        if (debut != "") {
+            sql = sql + " and debut='"+debut+":00'";
+        }
+        if(nomscene.isEmpty() == false){
+            sql = sql + " AND nom_scene like '%"+nomscene+"%'";
+        }
+        System.out.println("jdhjhd = "+sql);
+        model.addAttribute("plateau",dao.findAll(Plateau.class));
+        model.addAttribute("scene",dao.findQuery(Scene.class,sql));
+        request.setAttribute("id",id);
+        return "Scene";
     }
 }

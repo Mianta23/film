@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@page import="java.util.List,com.example.film.model.*"%>
-<%Film film = (Film)request.getAttribute("film");%>
-<%List<Scene> scene = (List<Scene>)request.getAttribute("scene");%>
+<%@page import="java.util.List"%>
+<%@ page import="com.example.film.model.Plateau" %>
+<%List<Plateau> plateau = (List<Plateau>)request.getAttribute("plateau");%>
 <html>
 <head>
     <link href="${pageContext.request.contextPath}/assets/img/favicon.png" rel="icon">
@@ -22,7 +22,7 @@
 
     <!-- Template Main CSS File -->
     <link href="${pageContext.request.contextPath}/assets/css/style.css" rel="stylesheet">
-  <title>Planning final</title>
+    <title>Liste des plateaux</title>
 </head>
 <body>
 <header id="header" class="header fixed-top d-flex align-items-center">
@@ -285,52 +285,28 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-        <h1>Planning final</h1>
+        <h1>Liste des films</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item">Planning</li>
-                <li class="breadcrumb-item active">Final</li>
+                <li class="breadcrumb-item">Films</li>
+                <li class="breadcrumb-item active">Plateaux</li>
             </ol>
         </nav>
     </div>
-<h1>Planning <%=film.getFilm()%></h1>
-    <table class="table table-striped">
+    <p class="h2">Liste:</p>
+<table class="table table-striped">
     <tr>
-      <th>date</th>
-      <th>Nom scene</th>
-      <th>film</th>
-      <th>Plateau</th>
-      <th>Debut</th>
-      <th>duree</th>
+        <th>Plateau</th>
+        <th>#</th>
     </tr>
-    <%for(Scene s:scene){%>
+    <%for(Plateau p:plateau){%>
     <tr>
-      <td><%=s.getDates().toString() %> <%=s.getDebut()%></td>
-      <td><%=s.getNomScene()%></td>
-      <td><%=s.getFilm().getFilm()%></td>
-      <td><%=s.getPlateau().getNomPlateau()%></td>
-      <td><%=s.getDebut()%></td>
-      <td><%=s.getFin()%></td>
-        <td><%=s.getDates().toString() %></td>
-        <td><button id="button<%=s.getId()%>" type="button" onclick="disponis('<%=s.getDates().toString() %>',<%=s.getId()%>)" >disponibilite</button></td>
+        <td><%=p.getNomPlateau()%></td>
+        <td><a href="<%=request.getContextPath()%>/liste-disponibilite?id=<%=p.getId()%>">Disponibilite</a></td>
     </tr>
     <%}%>
-  </table>
-    <script>
-        function disponis(datesy,id){
-            alert(datesy);
-            alert(id);
-            let formActuStatus = new FormData();
-            formActuStatus.append('id', id);
-            formActuStatus.append('date',datesy);
-            fetch('<%=request.getContextPath()%>/disponibilite?id='+id+"&&date="+datesy, {
-                method: 'GET'
-            }).then(() => alert('reussi'));
-            var b = document.getElementById("button"+id);
-            b.innerHTML="<button disabled> disponilite</button>"
-        }
-    </script>
+</table>
 </main>
 <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -346,6 +322,5 @@
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
-
 </body>
 </html>

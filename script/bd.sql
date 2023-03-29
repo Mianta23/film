@@ -2,6 +2,7 @@ create role film login password 'film';
 create database film;
 alter database film owner to film;
 
+
 create table film(
                      id serial primary key ,
                      film varchar(255)
@@ -12,9 +13,11 @@ select * from film;
 
 create table plateau(
                         idplateau serial primary key ,
-                        nom_plateau varchar(50)
+                        nom_plateau varchar(50),
+                        x decimal(20,4),
+                        y decimal(20,4)
 );
-insert into plateau(nom_plateau) values ('Andranomena'),('Antanimena'),('Analakely'),('Ambohibao'),('Ankadifotsy');
+insert into plateau(nom_plateau,x,y) values ('Andranomena',10,20),('Antanimena',5,15),('Analakely',6,16),('Ambohibao',11,21),('Ankadifotsy',4,14);
 select * from plateau;
 
 create table action(
@@ -68,11 +71,18 @@ insert into admin (username, mdp) VALUES ('admin','admin');
 alter table scene add column debut time;
 alter table scene add column fin time;
 
-alter table plateau add column x decimal(20,4);
-alter table plateau add column y decimal(20,4);
 
 select * from scene;
 select * from plateau;
+
+create table Disponibilite(
+                              id serial primary key,
+                              idscene int,
+                              idplateau int ,
+                              dates date not null,
+                              foreign key (idscene) references scene(idscene),
+                              foreign key (idplateau) references plateau(idplateau)
+);
 
 create or replace function getDurree(idsce integer)
     returns time
@@ -91,7 +101,11 @@ End;
 $$;
 
 create or replace view vScene as
-select idscene,nom_scene,idfilm,idplateau,debut, COALESCE(getDurree(idscene),'00:00:00') as fin from scene;
+select idscene,nom_scene,idfilm,idplateau,debut, COALESCE(getDurree(idscene),'00:00:00') as fin from scene where idscene not in (select idscene from Disponibilite);
 
 select * from vScene;
 select * from vscene where idfilm=1 order by debut,idplateau asc;
+
+
+
+
